@@ -107,9 +107,9 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="gson-2.6.1" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-23.4.0" level="project" />
-    <orderEntry type="library" exported="" name="anko-appcompat-v7-0.8.3" level="project" />
-    <orderEntry type="library" exported="" name="kotlin-stdlib-1.0.2" level="project" />
     <orderEntry type="library" exported="" name="okio-1.6.0" level="project" />
+    <orderEntry type="library" exported="" name="kotlin-stdlib-1.0.2" level="project" />
+    <orderEntry type="library" exported="" name="anko-appcompat-v7-0.8.3" level="project" />
     <orderEntry type="library" exported="" name="anko-cardview-v7-0.8.3" level="project" />
     <orderEntry type="library" exported="" name="anko-design-0.8.3" level="project" />
     <orderEntry type="library" exported="" name="okhttp-2.5.0" level="project" />
