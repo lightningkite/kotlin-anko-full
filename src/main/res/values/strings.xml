@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">Kotlin Anko Full</string>
+    <string name="camera">Camera</string>
+    <string name="gallery">Gallery</string>
 </resources>

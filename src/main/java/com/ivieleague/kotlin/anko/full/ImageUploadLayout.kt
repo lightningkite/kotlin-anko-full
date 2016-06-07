@@ -21,7 +21,6 @@ import com.ivieleague.kotlin.networking.async
 import com.ivieleague.kotlin.observable.property.MutableObservableProperty
 import com.ivieleague.kotlin.observable.property.StandardObservableProperty
 import com.ivieleague.kotlin.observable.property.bind
-import com.lightningkite.kotlincomponents.R
 import org.jetbrains.anko.*
 
 /**
