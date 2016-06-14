@@ -1,6 +1,8 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'com.github.dcendents.android-maven'
 
+group = "com.github.lightningkite"
 
 android {
     compileSdkVersion 23
@@ -39,9 +41,19 @@ repositories {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
-    compile project(':kotlin-anko-networking')
-    compile project(':kotlin-anko-observable')
-    compile project(':kotlin-anko-view-controllers')
+    compile "com.github.lightningkite:kotlin-anko-networking:publish-SNAPSHOT"
+    compile "com.github.lightningkite:kotlin-anko-observable:publish-SNAPSHOT"
+    compile "com.github.lightningkite:kotlin-anko-view-controllers:publish-SNAPSHOT"
+}
+
+// build a jar with source files
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+artifacts {
+    archives sourcesJar
 }
 
 buildscript {
@@ -49,6 +61,7 @@ buildscript {
     repositories {
         mavenCentral()
     }
+
     dependencies {
         classpath 'com.android.tools.build:gradle:2.1.2'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.3'
