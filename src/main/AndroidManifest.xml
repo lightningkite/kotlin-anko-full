@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.ivieleague.kotlin.anko.full">
+    package="com.lightningkite.kotlin.anko.full">
 
     <application
         android:allowBackup="true"

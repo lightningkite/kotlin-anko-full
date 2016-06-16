@@ -1,4 +1,4 @@
-package com.ivieleague.kotlin.anko.full
+package com.lightningkite.kotlin.anko.full
 
 import android.Manifest
 import android.content.Context
@@ -7,20 +7,20 @@ import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
-import com.ivieleague.kotlin.anko.animation.transitionView
-import com.ivieleague.kotlin.anko.networking.image.imageStreamExif
-import com.ivieleague.kotlin.anko.observable.lifecycle
-import com.ivieleague.kotlin.anko.selector
-import com.ivieleague.kotlin.anko.viewcontrollers.image.getImageUriFromCamera
-import com.ivieleague.kotlin.anko.viewcontrollers.image.getImageUriFromGallery
-import com.ivieleague.kotlin.anko.viewcontrollers.implementations.VCActivity
-import com.ivieleague.kotlin.networking.NetRequest
-import com.ivieleague.kotlin.networking.Networking
-import com.ivieleague.kotlin.networking.asStringOptional
-import com.ivieleague.kotlin.networking.async
-import com.ivieleague.kotlin.observable.property.MutableObservableProperty
-import com.ivieleague.kotlin.observable.property.StandardObservableProperty
-import com.ivieleague.kotlin.observable.property.bind
+import com.lightningkite.kotlin.anko.animation.transitionView
+import com.lightningkite.kotlin.anko.networking.image.imageStreamExif
+import com.lightningkite.kotlin.anko.observable.lifecycle
+import com.lightningkite.kotlin.anko.selector
+import com.lightningkite.kotlin.anko.viewcontrollers.image.getImageUriFromCamera
+import com.lightningkite.kotlin.anko.viewcontrollers.image.getImageUriFromGallery
+import com.lightningkite.kotlin.anko.viewcontrollers.implementations.VCActivity
+import com.lightningkite.kotlin.networking.NetRequest
+import com.lightningkite.kotlin.networking.Networking
+import com.lightningkite.kotlin.networking.asStringOptional
+import com.lightningkite.kotlin.networking.async
+import com.lightningkite.kotlin.observable.property.MutableObservableProperty
+import com.lightningkite.kotlin.observable.property.StandardObservableProperty
+import com.lightningkite.kotlin.observable.property.bind
 import org.jetbrains.anko.*
 
 /**
