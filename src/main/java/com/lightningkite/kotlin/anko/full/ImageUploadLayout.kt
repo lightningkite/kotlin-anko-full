@@ -32,6 +32,7 @@ fun ViewGroup.layoutImageUpload(
         uploadingObs: StandardObservableProperty<Boolean>,
         doUpload: (Uri, (String?) -> Unit) -> Unit,
         onUploadError: () -> Unit,
+        fileProviderAuthority: String,
         imageMinBytes: Long = 250 * 250
 ): View {
     val loadingObs = StandardObservableProperty(false)
@@ -68,7 +69,7 @@ fun ViewGroup.layoutImageUpload(
                     null,
                     R.string.camera to {
                         activity.requestPermissions(arrayOf(Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                            activity.getImageUriFromCamera() {
+                            activity.getImageUriFromCamera(fileProviderAuthority = fileProviderAuthority) {
                                 Log.i("ImageUploadLayout", it.toString())
                                 if (it != null) {
                                     uploadingObs.value = true
@@ -124,9 +125,17 @@ fun ViewGroup.layoutImageUpload(
         downloadRequest = downloadRequest,
         uploadingObs = uploadingObs,
         onUploadError = onUploadError,
+        fileProviderAuthority = "com.summertechnologies.pasturemap.fileprovider",
         doUpload = { uri, callback ->
             Networking.async(uploadRequest(uri)) {
-                callback(it.jsonObject().get("url")?.asStringOptional)
+                val url = try {
+                    println(it.string())
+                    it.jsonObject().get("url")?.asStringOptional
+                } catch(e: Exception) {
+                    e.printStackTrace()
+                    null
+                }
+                callback(url)
             }
         }
 )
