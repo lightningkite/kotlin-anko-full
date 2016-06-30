@@ -1,7 +1,6 @@
 package com.lightningkite.kotlin.anko.full
 
 import android.Manifest
-import android.content.Context
 import android.net.Uri
 import android.util.Log
 import android.view.Gravity
@@ -14,10 +13,7 @@ import com.lightningkite.kotlin.anko.selector
 import com.lightningkite.kotlin.anko.viewcontrollers.image.getImageUriFromCamera
 import com.lightningkite.kotlin.anko.viewcontrollers.image.getImageUriFromGallery
 import com.lightningkite.kotlin.anko.viewcontrollers.implementations.VCActivity
-import com.lightningkite.kotlin.networking.NetRequest
-import com.lightningkite.kotlin.networking.Networking
-import com.lightningkite.kotlin.networking.asStringOptional
-import com.lightningkite.kotlin.networking.async
+import com.lightningkite.kotlin.networking.*
 import com.lightningkite.kotlin.observable.property.MutableObservableProperty
 import com.lightningkite.kotlin.observable.property.StandardObservableProperty
 import com.lightningkite.kotlin.observable.property.bind
@@ -32,10 +28,11 @@ fun ViewGroup.layoutImageUpload(
         urlObs: MutableObservableProperty<String?>,
         noImageResource: Int,
         brokenImageResource: Int,
-        downloadRequest: NetRequest,
+        downloadRequest: NetRequest = NetRequest(NetMethod.GET, ""),
         uploadingObs: StandardObservableProperty<Boolean>,
-        uploadRequest: (Uri) -> NetRequest,
-        onUploadError: () -> Unit
+        doUpload: (Uri, (String?) -> Unit) -> Unit,
+        onUploadError: () -> Unit,
+        imageMinBytes: Long = 250 * 250
 ): View {
     val loadingObs = StandardObservableProperty(false)
     return transitionView {
@@ -48,9 +45,9 @@ fun ViewGroup.layoutImageUpload(
                     imageResource = noImageResource
                 } else {
                     loadingObs.value = (true)
-                    imageStreamExif(activity, downloadRequest.copy(url = url), 500) { success ->
+                    imageStreamExif(activity, downloadRequest.copy(url = url), minBytes = imageMinBytes, brokenImageResource = brokenImageResource) { disposer ->
                         loadingObs.value = (false)
-                        if (!success) {
+                        if (disposer == null) {
                             //set to default image or broken image
                             imageResource = brokenImageResource
                         }
@@ -72,16 +69,30 @@ fun ViewGroup.layoutImageUpload(
                     R.string.camera to {
                         activity.requestPermissions(arrayOf(Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE)) {
                             activity.getImageUriFromCamera() {
-                                println(it)
-                                if (it != null) uploadImage(context, uploadRequest(it), urlObs, uploadingObs, onUploadError)
+                                Log.i("ImageUploadLayout", it.toString())
+                                if (it != null) {
+                                    uploadingObs.value = true
+                                    doUpload(it) {
+                                        uploadingObs.value = false
+                                        if (it == null) onUploadError()
+                                        else urlObs.value = it
+                                    }
+                                }
                             }
                         }
                     },
                     R.string.gallery to {
                         activity.requestPermission(Manifest.permission.READ_EXTERNAL_STORAGE) {
                             activity.getImageUriFromGallery() {
-                                println(it)
-                                if (it != null) uploadImage(context, uploadRequest(it), urlObs, uploadingObs, onUploadError)
+                                Log.i("ImageUploadLayout", it.toString())
+                                if (it != null) {
+                                    uploadingObs.value = true
+                                    doUpload(it) {
+                                        uploadingObs.value = false
+                                        if (it == null) onUploadError()
+                                        else urlObs.value = it
+                                    }
+                                }
                             }
                         }
                     }
@@ -92,37 +103,30 @@ fun ViewGroup.layoutImageUpload(
     }
 }
 
-inline fun uploadImage(
-        context: Context,
-        request: NetRequest,
+/**
+ * Makes a layout to upload an image.
+ * Created by jivie on 6/2/16.
+ */
+fun ViewGroup.layoutImageUpload(
+        activity: VCActivity,
         urlObs: MutableObservableProperty<String?>,
-        uploading: MutableObservableProperty<Boolean>,
-        crossinline onError: () -> Unit
-) {
-    uploading.value = (true)
-    try {
-        Networking.async(request) {
-            uploading.value = (false)
-            try {
-                if (it.isSuccessful) {
-                    val newUrl = it.jsonObject().get("url")?.asStringOptional
-                    Log.i("image.Layouts", "newUrl=$newUrl")
-                    if (newUrl != null) {
-                        urlObs.value = (newUrl)
-                    }
-                } else {
-                    Log.e("image.Layouts", "failed. ${it.code}: ${it.string()}")
-                    onError()
-                }
-            } catch(e: Exception) {
-                uploading.value = (false)
-                e.printStackTrace()
-                onError()
+        noImageResource: Int,
+        brokenImageResource: Int,
+        downloadRequest: NetRequest = NetRequest(NetMethod.GET, ""),
+        uploadingObs: StandardObservableProperty<Boolean>,
+        uploadRequest: (Uri) -> NetRequest,
+        onUploadError: () -> Unit
+): View = layoutImageUpload(
+        activity = activity,
+        urlObs = urlObs,
+        noImageResource = noImageResource,
+        brokenImageResource = brokenImageResource,
+        downloadRequest = downloadRequest,
+        uploadingObs = uploadingObs,
+        onUploadError = onUploadError,
+        doUpload = { uri, callback ->
+            Networking.async(uploadRequest(uri)) {
+                callback(it.jsonObject().get("url")?.asStringOptional)
             }
         }
-    } catch(e: Exception) {
-        uploading.value = (false)
-        e.printStackTrace()
-        onError()
-    }
-}
+)
