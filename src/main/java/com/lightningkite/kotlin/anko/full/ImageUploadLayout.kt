@@ -115,8 +115,10 @@ fun ViewGroup.layoutImageUpload(
         brokenImageResource: Int,
         downloadRequest: NetRequest = NetRequest(NetMethod.GET, ""),
         uploadingObs: StandardObservableProperty<Boolean>,
+        fileProviderAuthority: String,
         uploadRequest: (Uri) -> NetRequest,
-        onUploadError: () -> Unit
+        onUploadError: () -> Unit,
+        imageMinBytes: Long = 250 * 250
 ): View = layoutImageUpload(
         activity = activity,
         urlObs = urlObs,
@@ -125,7 +127,8 @@ fun ViewGroup.layoutImageUpload(
         downloadRequest = downloadRequest,
         uploadingObs = uploadingObs,
         onUploadError = onUploadError,
-        fileProviderAuthority = "com.summertechnologies.pasturemap.fileprovider",
+        fileProviderAuthority = fileProviderAuthority,
+        imageMinBytes = imageMinBytes,
         doUpload = { uri, callback ->
             Networking.async(uploadRequest(uri)) {
                 val url = try {
