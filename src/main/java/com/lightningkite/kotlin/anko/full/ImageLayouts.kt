@@ -6,18 +6,47 @@ import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import com.lightningkite.kotlin.anko.animation.TransitionView
 import com.lightningkite.kotlin.anko.animation.transitionView
 import com.lightningkite.kotlin.anko.networking.image.imageStreamExif
 import com.lightningkite.kotlin.anko.observable.lifecycle
+import com.lightningkite.kotlin.anko.observable.progressLayout
 import com.lightningkite.kotlin.anko.selector
 import com.lightningkite.kotlin.anko.viewcontrollers.image.getImageUriFromCamera
 import com.lightningkite.kotlin.anko.viewcontrollers.image.getImageUriFromGallery
 import com.lightningkite.kotlin.anko.viewcontrollers.implementations.VCActivity
 import com.lightningkite.kotlin.networking.*
 import com.lightningkite.kotlin.observable.property.MutableObservableProperty
+import com.lightningkite.kotlin.observable.property.ObservableProperty
 import com.lightningkite.kotlin.observable.property.StandardObservableProperty
 import com.lightningkite.kotlin.observable.property.bind
 import org.jetbrains.anko.*
+
+/**
+ * Various layouts that require all packages.
+ * Created by jivie on 7/15/16.
+ */
+fun ViewGroup.layoutImage(
+        urlObservable: ObservableProperty<String?>,
+        noImageResource: Int,
+        brokenImageResource: Int,
+        imageMinBytes: Long = 250 * 250 * 4,
+        downloadRequest: NetRequest = NetRequest(NetMethod.GET, ""),
+        loadingObs: MutableObservableProperty<Boolean> = StandardObservableProperty(false),
+        setup: TransitionView.() -> Unit = {}
+): View = progressLayout(loadingObs) {
+    padding = dip(8)
+    imageView {
+        bindUrl(
+                urlObservable = urlObservable,
+                noImageResource = noImageResource,
+                brokenImageResource = brokenImageResource,
+                imageMinBytes = imageMinBytes,
+                downloadRequest = downloadRequest,
+                loadingObs = loadingObs
+        )
+    }.lparams(matchParent, matchParent)
+}.apply(setup)
 
 /**
  * Makes a layout to upload an image.
