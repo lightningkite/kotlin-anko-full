@@ -18,7 +18,7 @@ fun ImageView.bindUrl(
         urlObservable: ObservableProperty<String?>,
         noImageResource: Int,
         brokenImageResource: Int,
-        imageMinBytes: Long = 250 * 250 * 4,
+        imageMinBytes: Long,
         downloadRequest: NetRequest = NetRequest(NetMethod.GET, ""),
         loadingObs: MutableObservableProperty<Boolean> = StandardObservableProperty(false)
 ) {
@@ -29,6 +29,38 @@ fun ImageView.bindUrl(
         } else {
             loadingObs.value = (true)
             imageStreamExif(context, downloadRequest.copy(url = url), minBytes = imageMinBytes, brokenImageResource = brokenImageResource) { disposer ->
+                loadingObs.value = (false)
+                if (disposer == null) {
+                    //set to default image or broken image
+                    imageResource = brokenImageResource
+                }
+            }
+        }
+    }
+}
+
+fun ImageView.bindUrl(
+        urlObservable: ObservableProperty<String?>,
+        noImageResource: Int,
+        brokenImageResource: Int,
+        imageMaxWidth: Int = 2048,
+        imageMaxHeight: Int = 2048,
+        downloadRequest: NetRequest = NetRequest(NetMethod.GET, ""),
+        loadingObs: MutableObservableProperty<Boolean> = StandardObservableProperty(false)
+) {
+    lifecycle.bind(urlObservable) { url ->
+        if (url == null) {
+            //set to default image
+            imageResource = noImageResource
+        } else {
+            loadingObs.value = (true)
+            imageStreamExif(
+                    context,
+                    downloadRequest.copy(url = url),
+                    maxWidth = imageMaxWidth,
+                    maxHeight = imageMaxHeight,
+                    brokenImageResource = brokenImageResource
+            ) { disposer ->
                 loadingObs.value = (false)
                 if (disposer == null) {
                     //set to default image or broken image
