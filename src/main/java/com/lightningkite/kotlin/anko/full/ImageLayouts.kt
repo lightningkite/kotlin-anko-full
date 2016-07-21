@@ -8,8 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import com.lightningkite.kotlin.anko.animation.TransitionView
 import com.lightningkite.kotlin.anko.animation.transitionView
+import com.lightningkite.kotlin.anko.lifecycle
 import com.lightningkite.kotlin.anko.networking.image.imageStreamExif
-import com.lightningkite.kotlin.anko.observable.lifecycle
 import com.lightningkite.kotlin.anko.observable.progressLayout
 import com.lightningkite.kotlin.anko.selector
 import com.lightningkite.kotlin.anko.viewcontrollers.image.getImageUriFromCamera

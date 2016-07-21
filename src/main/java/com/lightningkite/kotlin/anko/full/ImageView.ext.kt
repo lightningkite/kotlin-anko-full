@@ -1,8 +1,8 @@
 package com.lightningkite.kotlin.anko.full
 
 import android.widget.ImageView
+import com.lightningkite.kotlin.anko.lifecycle
 import com.lightningkite.kotlin.anko.networking.image.imageStreamExif
-import com.lightningkite.kotlin.anko.observable.lifecycle
 import com.lightningkite.kotlin.networking.NetMethod
 import com.lightningkite.kotlin.networking.NetRequest
 import com.lightningkite.kotlin.observable.property.MutableObservableProperty
