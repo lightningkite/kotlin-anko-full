@@ -23,7 +23,7 @@ fun ImageView.bindUrl(
         loadingObs: MutableObservableProperty<Boolean> = StandardObservableProperty(false)
 ) {
     lifecycle.bind(urlObservable) { url ->
-        if (url == null) {
+        if (url == null || url.isEmpty()) {
             //set to default image
             imageResource = noImageResource
         } else {
