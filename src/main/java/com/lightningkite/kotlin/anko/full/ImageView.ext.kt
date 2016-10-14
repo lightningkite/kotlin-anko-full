@@ -77,7 +77,7 @@ fun ImageView.bindUri(
         uriObservable: ObservableProperty<String?>,
         noImageResource: Int,
         brokenImageResource: Int,
-        imageMinBytes: Long = Long.MAX_VALUE,
+        imageMinBytes: Long,
         downloadRequest: NetRequest = NetRequest(NetMethod.GET, ""),
         loadingObs: MutableObservableProperty<Boolean> = StandardObservableProperty(false)
 ) {
@@ -99,6 +99,44 @@ fun ImageView.bindUri(
             } else {
                 loadingObs.value = (true)
                 imageUri(uriObj, imageMinBytes, brokenImageResource) { disposer ->
+                    loadingObs.value = (false)
+                    if (disposer == null) {
+                        //set to default image or broken image
+                        imageResource = brokenImageResource
+                    }
+                }
+            }
+        }
+    }
+}
+
+fun ImageView.bindUri(
+        uriObservable: ObservableProperty<String?>,
+        noImageResource: Int,
+        brokenImageResource: Int,
+        imageMaxWidth: Int = 2048,
+        imageMaxHeight: Int = 2048,
+        downloadRequest: NetRequest = NetRequest(NetMethod.GET, ""),
+        loadingObs: MutableObservableProperty<Boolean> = StandardObservableProperty(false)
+) {
+    lifecycle.bind(uriObservable) { uri ->
+        if (uri == null || uri.isEmpty()) {
+            //set to default image
+            imageResource = noImageResource
+        } else {
+            val uriObj = Uri.parse(uri)
+            if (uriObj.scheme.contains("http")) {
+                loadingObs.value = (true)
+                imageStreamExif(context, downloadRequest.copy(url = uri), imageMaxWidth, imageMaxHeight, brokenImageResource = brokenImageResource) { disposer ->
+                    loadingObs.value = (false)
+                    if (disposer == null) {
+                        //set to default image or broken image
+                        imageResource = brokenImageResource
+                    }
+                }
+            } else {
+                loadingObs.value = (true)
+                imageUri(uriObj, imageMaxWidth, imageMaxHeight, brokenImageResource) { disposer ->
                     loadingObs.value = (false)
                     if (disposer == null) {
                         //set to default image or broken image
