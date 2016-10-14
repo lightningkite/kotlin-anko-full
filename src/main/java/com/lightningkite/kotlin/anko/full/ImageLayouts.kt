@@ -39,3 +39,25 @@ fun ViewGroup.layoutImage(
         )
     }.lparams(matchParent, matchParent)
 }.apply(setup)
+
+fun ViewGroup.layoutImageUri(
+        uriObservable: ObservableProperty<String?>,
+        noImageResource: Int,
+        brokenImageResource: Int,
+        imageMinBytes: Long = 250 * 250 * 4,
+        downloadRequest: NetRequest = NetRequest(NetMethod.GET, ""),
+        loadingObs: MutableObservableProperty<Boolean> = StandardObservableProperty(false),
+        setup: TransitionView.() -> Unit = {}
+): View = progressLayout(loadingObs) {
+    padding = dip(8)
+    imageView {
+        bindUri(
+                uriObservable = uriObservable,
+                noImageResource = noImageResource,
+                brokenImageResource = brokenImageResource,
+                imageMinBytes = imageMinBytes,
+                downloadRequest = downloadRequest,
+                loadingObs = loadingObs
+        )
+    }.lparams(matchParent, matchParent)
+}.apply(setup)

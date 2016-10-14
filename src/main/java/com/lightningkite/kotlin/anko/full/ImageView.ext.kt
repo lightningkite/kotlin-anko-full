@@ -1,6 +1,8 @@
 package com.lightningkite.kotlin.anko.full
 
+import android.net.Uri
 import android.widget.ImageView
+import com.lightningkite.kotlin.anko.imageUri
 import com.lightningkite.kotlin.anko.lifecycle
 import com.lightningkite.kotlin.anko.networking.image.imageStreamExif
 import com.lightningkite.kotlin.networking.NetMethod
@@ -65,6 +67,43 @@ fun ImageView.bindUrl(
                 if (disposer == null) {
                     //set to default image or broken image
                     imageResource = brokenImageResource
+                }
+            }
+        }
+    }
+}
+
+fun ImageView.bindUri(
+        uriObservable: ObservableProperty<String?>,
+        noImageResource: Int,
+        brokenImageResource: Int,
+        imageMinBytes: Long = Long.MAX_VALUE,
+        downloadRequest: NetRequest = NetRequest(NetMethod.GET, ""),
+        loadingObs: MutableObservableProperty<Boolean> = StandardObservableProperty(false)
+) {
+    lifecycle.bind(uriObservable) { uri ->
+        if (uri == null || uri.isEmpty()) {
+            //set to default image
+            imageResource = noImageResource
+        } else {
+            val uriObj = Uri.parse(uri)
+            if (uriObj.scheme.contains("http")) {
+                loadingObs.value = (true)
+                imageStreamExif(context, downloadRequest.copy(url = uri), minBytes = imageMinBytes, brokenImageResource = brokenImageResource) { disposer ->
+                    loadingObs.value = (false)
+                    if (disposer == null) {
+                        //set to default image or broken image
+                        imageResource = brokenImageResource
+                    }
+                }
+            } else {
+                loadingObs.value = (true)
+                imageUri(uriObj, imageMinBytes, brokenImageResource) { disposer ->
+                    loadingObs.value = (false)
+                    if (disposer == null) {
+                        //set to default image or broken image
+                        imageResource = brokenImageResource
+                    }
                 }
             }
         }
