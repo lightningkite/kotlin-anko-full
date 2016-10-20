@@ -2,7 +2,7 @@ package com.lightningkite.kotlin.anko.full
 
 import android.net.Uri
 import android.widget.ImageView
-import com.lightningkite.kotlin.anko.imageUri
+import com.lightningkite.kotlin.anko.imageLocalUri
 import com.lightningkite.kotlin.anko.lifecycle
 import com.lightningkite.kotlin.anko.networking.image.imageStreamExif
 import com.lightningkite.kotlin.networking.NetMethod
@@ -98,7 +98,7 @@ fun ImageView.bindUri(
                 }
             } else {
                 loadingObs.value = (true)
-                imageUri(uriObj, imageMinBytes, brokenImageResource) { disposer ->
+                imageLocalUri(uriObj, imageMinBytes, brokenImageResource) { disposer ->
                     loadingObs.value = (false)
                     if (disposer == null) {
                         //set to default image or broken image
@@ -136,7 +136,7 @@ fun ImageView.bindUri(
                 }
             } else {
                 loadingObs.value = (true)
-                imageUri(uriObj, imageMaxWidth, imageMaxHeight, brokenImageResource) { disposer ->
+                imageLocalUri(uriObj, imageMaxWidth, imageMaxHeight, brokenImageResource) { disposer ->
                     loadingObs.value = (false)
                     if (disposer == null) {
                         //set to default image or broken image
