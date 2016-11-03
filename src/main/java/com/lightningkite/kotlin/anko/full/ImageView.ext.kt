@@ -11,6 +11,7 @@ import com.lightningkite.kotlin.observable.property.MutableObservableProperty
 import com.lightningkite.kotlin.observable.property.ObservableProperty
 import com.lightningkite.kotlin.observable.property.StandardObservableProperty
 import com.lightningkite.kotlin.observable.property.bind
+import org.jetbrains.anko.image
 import org.jetbrains.anko.imageResource
 
 /**
@@ -18,23 +19,31 @@ import org.jetbrains.anko.imageResource
  */
 fun ImageView.bindUrl(
         urlObservable: ObservableProperty<String?>,
-        noImageResource: Int,
-        brokenImageResource: Int,
+        noImageResource: Int? = null,
+        brokenImageResource: Int? = null,
         imageMinBytes: Long,
         downloadRequest: NetRequest = NetRequest(NetMethod.GET, ""),
         loadingObs: MutableObservableProperty<Boolean> = StandardObservableProperty(false)
 ) {
     lifecycle.bind(urlObservable) { url ->
-        if (url == null || url.isEmpty()) {
+        if (url == null || url.isBlank()) {
             //set to default image
-            imageResource = noImageResource
+            if (noImageResource != null) {
+                imageResource = noImageResource
+            } else {
+                image = null
+            }
         } else {
             loadingObs.value = (true)
             imageStreamExif(context, downloadRequest.copy(url = url), minBytes = imageMinBytes, brokenImageResource = brokenImageResource) { disposer ->
                 loadingObs.value = (false)
                 if (disposer == null) {
                     //set to default image or broken image
-                    imageResource = brokenImageResource
+                    if (brokenImageResource != null) {
+                        imageResource = brokenImageResource
+                    } else {
+                        image = null
+                    }
                 }
             }
         }
@@ -43,17 +52,21 @@ fun ImageView.bindUrl(
 
 fun ImageView.bindUrl(
         urlObservable: ObservableProperty<String?>,
-        noImageResource: Int,
-        brokenImageResource: Int,
+        noImageResource: Int? = null,
+        brokenImageResource: Int? = null,
         imageMaxWidth: Int = 2048,
         imageMaxHeight: Int = 2048,
         downloadRequest: NetRequest = NetRequest(NetMethod.GET, ""),
         loadingObs: MutableObservableProperty<Boolean> = StandardObservableProperty(false)
 ) {
     lifecycle.bind(urlObservable) { url ->
-        if (url == null) {
+        if (url == null || url.isBlank()) {
             //set to default image
-            imageResource = noImageResource
+            if (noImageResource != null) {
+                imageResource = noImageResource
+            } else {
+                image = null
+            }
         } else {
             loadingObs.value = (true)
             imageStreamExif(
@@ -66,7 +79,11 @@ fun ImageView.bindUrl(
                 loadingObs.value = (false)
                 if (disposer == null) {
                     //set to default image or broken image
-                    imageResource = brokenImageResource
+                    if (brokenImageResource != null) {
+                        imageResource = brokenImageResource
+                    } else {
+                        image = null
+                    }
                 }
             }
         }
