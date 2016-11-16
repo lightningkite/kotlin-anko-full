@@ -22,7 +22,11 @@ fun ImageView.bindUri(
         requestBuilder: Request.Builder = Request.Builder(),
         loadingObs: MutableObservableProperty<Boolean> = StandardObservableProperty(false)
 ) {
+    var lastUri: String? = "nomatch"
     lifecycle.bind(uriObservable) { uri ->
+        if (uri == lastUri) return@bind
+        lastUri = uri
+
         if (uri == null || uri.isEmpty()) {
             //set to default image
             if (noImageResource != null) {
@@ -66,7 +70,11 @@ fun ImageView.bindUri(
         requestBuilder: Request.Builder = Request.Builder(),
         loadingObs: MutableObservableProperty<Boolean> = StandardObservableProperty(false)
 ) {
+    var lastUri: String? = "nomatch"
     lifecycle.bind(uriObservable) { uri ->
+        if (uri == lastUri) return@bind
+        lastUri = uri
+
         if (uri == null || uri.isEmpty()) {
             //set to default image
             if (noImageResource != null) {
