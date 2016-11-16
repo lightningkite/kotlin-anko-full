@@ -48,7 +48,6 @@ fun ImageView.bindUri(
                     }
                 }
             } else {
-                loadingObs.value = (true)
                 try {
                     imageBitmap = context.getBitmapFromUri(Uri.parse(uri), 2048, 2048)!!
                 } catch(e: Exception) {
@@ -96,7 +95,6 @@ fun ImageView.bindUri(
                     }
                 }
             } else {
-                loadingObs.value = (true)
                 try {
                     imageBitmap = context.getBitmapFromUri(Uri.parse(uri), 2048, 2048)!!
                 } catch(e: Exception) {
