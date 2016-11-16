@@ -2,6 +2,7 @@ package com.lightningkite.kotlin.anko.full
 
 import android.net.Uri
 import android.widget.ImageView
+import com.lightningkite.kotlin.anko.image.getBitmapFromUri
 import com.lightningkite.kotlin.anko.lifecycle
 import com.lightningkite.kotlin.anko.networking.image.lambdaBitmapExif
 import com.lightningkite.kotlin.async.invokeAsync
@@ -12,7 +13,6 @@ import com.lightningkite.kotlin.observable.property.bind
 import okhttp3.Request
 import org.jetbrains.anko.imageBitmap
 import org.jetbrains.anko.imageResource
-import org.jetbrains.anko.imageURI
 
 fun ImageView.bindUri(
         uriObservable: ObservableProperty<String?>,
@@ -24,7 +24,7 @@ fun ImageView.bindUri(
 ) {
     var lastUri: String? = "nomatch"
     lifecycle.bind(uriObservable) { uri ->
-        if (uri == lastUri) return@bind
+        if (lastUri == uri) return@bind
         lastUri = uri
 
         if (uri == null || uri.isEmpty()) {
@@ -50,7 +50,7 @@ fun ImageView.bindUri(
             } else {
                 loadingObs.value = (true)
                 try {
-                    imageURI = Uri.parse(uri)
+                    imageBitmap = context.getBitmapFromUri(Uri.parse(uri), 2048, 2048)!!
                 } catch(e: Exception) {
                     if (brokenImageResource != null) {
                         imageResource = brokenImageResource
@@ -72,7 +72,7 @@ fun ImageView.bindUri(
 ) {
     var lastUri: String? = "nomatch"
     lifecycle.bind(uriObservable) { uri ->
-        if (uri == lastUri) return@bind
+        if (lastUri == uri) return@bind
         lastUri = uri
 
         if (uri == null || uri.isEmpty()) {
@@ -98,7 +98,7 @@ fun ImageView.bindUri(
             } else {
                 loadingObs.value = (true)
                 try {
-                    imageURI = Uri.parse(uri)
+                    imageBitmap = context.getBitmapFromUri(Uri.parse(uri), 2048, 2048)!!
                 } catch(e: Exception) {
                     if (brokenImageResource != null) {
                         imageResource = brokenImageResource
