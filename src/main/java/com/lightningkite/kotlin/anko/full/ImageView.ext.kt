@@ -20,7 +20,8 @@ fun ImageView.bindUri(
         brokenImageResource: Int? = null,
         imageMinBytes: Long,
         requestBuilder: Request.Builder = Request.Builder(),
-        loadingObs: MutableObservableProperty<Boolean> = StandardObservableProperty(false)
+        loadingObs: MutableObservableProperty<Boolean> = StandardObservableProperty(false),
+        onLoadComplete: (state: Int) -> Unit = {}
 ) {
     var lastUri: String? = "nomatch"
     lifecycle.bind(uriObservable) { uri ->
@@ -32,6 +33,7 @@ fun ImageView.bindUri(
             if (noImageResource != null) {
                 imageResource = noImageResource
             }
+            onLoadComplete(0)
         } else {
             val uriObj = Uri.parse(uri)
             if (uriObj.scheme.contains("http")) {
@@ -43,17 +45,21 @@ fun ImageView.bindUri(
                         if (brokenImageResource != null) {
                             imageResource = brokenImageResource
                         }
+                        onLoadComplete(-1)
                     } else {
                         imageBitmap = it.result
+                        onLoadComplete(1)
                     }
                 }
             } else {
                 try {
                     imageBitmap = context.getBitmapFromUri(Uri.parse(uri), 2048, 2048)!!
+                    onLoadComplete(1)
                 } catch(e: Exception) {
                     if (brokenImageResource != null) {
                         imageResource = brokenImageResource
                     }
+                    onLoadComplete(-1)
                 }
             }
         }
@@ -67,7 +73,8 @@ fun ImageView.bindUri(
         imageMaxWidth: Int = 2048,
         imageMaxHeight: Int = 2048,
         requestBuilder: Request.Builder = Request.Builder(),
-        loadingObs: MutableObservableProperty<Boolean> = StandardObservableProperty(false)
+        loadingObs: MutableObservableProperty<Boolean> = StandardObservableProperty(false),
+        onLoadComplete: (state: Int) -> Unit = {}
 ) {
     var lastUri: String? = "nomatch"
     lifecycle.bind(uriObservable) { uri ->
@@ -79,6 +86,7 @@ fun ImageView.bindUri(
             if (noImageResource != null) {
                 imageResource = noImageResource
             }
+            onLoadComplete(0)
         } else {
             val uriObj = Uri.parse(uri)
             if (uriObj.scheme.contains("http")) {
@@ -90,17 +98,21 @@ fun ImageView.bindUri(
                         if (brokenImageResource != null) {
                             imageResource = brokenImageResource
                         }
+                        onLoadComplete(-1)
                     } else {
                         imageBitmap = it.result
+                        onLoadComplete(1)
                     }
                 }
             } else {
                 try {
                     imageBitmap = context.getBitmapFromUri(Uri.parse(uri), 2048, 2048)!!
+                    onLoadComplete(1)
                 } catch(e: Exception) {
                     if (brokenImageResource != null) {
                         imageResource = brokenImageResource
                     }
+                    onLoadComplete(-1)
                 }
             }
         }
