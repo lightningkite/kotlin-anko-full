@@ -1,5 +1,6 @@
 package com.lightningkite.kotlin.anko.full
 
+import android.graphics.Bitmap
 import android.net.Uri
 import android.widget.ImageView
 import com.lightningkite.kotlin.anko.image.getBitmapFromUri
@@ -100,6 +101,121 @@ fun ImageView.bindUri(
                         }
                         onLoadComplete(-1)
                     } else {
+                        imageBitmap = it.result
+                        onLoadComplete(1)
+                    }
+                }
+            } else {
+                try {
+                    imageBitmap = context.getBitmapFromUri(Uri.parse(uri), 2048, 2048)!!
+                    onLoadComplete(1)
+                } catch(e: Exception) {
+                    if (brokenImageResource != null) {
+                        imageResource = brokenImageResource
+                    }
+                    onLoadComplete(-1)
+                }
+            }
+        }
+    }
+}
+
+fun ImageView.bindUri(
+        uriObservable: ObservableProperty<String?>,
+        cache: MutableMap<String, Bitmap>,
+        noImageResource: Int? = null,
+        brokenImageResource: Int? = null,
+        imageMinBytes: Long,
+        requestBuilder: Request.Builder = Request.Builder(),
+        loadingObs: MutableObservableProperty<Boolean> = StandardObservableProperty(false),
+        onLoadComplete: (state: Int) -> Unit = {}
+) {
+    var lastUri: String? = "nomatch"
+    lifecycle.bind(uriObservable) { uri ->
+        if (lastUri == uri) return@bind
+        lastUri = uri
+
+        if (uri == null || uri.isEmpty()) {
+            //set to default image
+            if (noImageResource != null) {
+                imageResource = noImageResource
+            }
+            onLoadComplete(0)
+        } else if (cache.containsKey(uri)) {
+            imageBitmap = cache[uri]!!
+            onLoadComplete(1)
+        } else {
+            val uriObj = Uri.parse(uri)
+            if (uriObj.scheme.contains("http")) {
+                loadingObs.value = (true)
+                requestBuilder.url(uri).lambdaBitmapExif(context, imageMinBytes).invokeAsync {
+                    loadingObs.value = (false)
+                    if (it.result == null) {
+                        //set to default image or broken image
+                        if (brokenImageResource != null) {
+                            imageResource = brokenImageResource
+                        }
+                        onLoadComplete(-1)
+                    } else {
+                        cache.put(uri, it.result!!)
+                        imageBitmap = it.result
+                        onLoadComplete(1)
+                    }
+                }
+            } else {
+                try {
+                    imageBitmap = context.getBitmapFromUri(Uri.parse(uri), 2048, 2048)!!
+                    onLoadComplete(1)
+                } catch(e: Exception) {
+                    if (brokenImageResource != null) {
+                        imageResource = brokenImageResource
+                    }
+                    onLoadComplete(-1)
+                }
+            }
+        }
+    }
+}
+
+fun ImageView.bindUri(
+        uriObservable: ObservableProperty<String?>,
+        cache: MutableMap<String, Bitmap>,
+        noImageResource: Int? = null,
+        brokenImageResource: Int? = null,
+        imageMaxWidth: Int = 2048,
+        imageMaxHeight: Int = 2048,
+        requestBuilder: Request.Builder = Request.Builder(),
+        loadingObs: MutableObservableProperty<Boolean> = StandardObservableProperty(false),
+        onLoadComplete: (state: Int) -> Unit = {}
+) {
+    var lastUri: String? = "nomatch"
+    lifecycle.bind(uriObservable) { uri ->
+        if (lastUri == uri) return@bind
+        lastUri = uri
+
+        if (uri == null || uri.isEmpty()) {
+            //set to default image
+            if (noImageResource != null) {
+                imageResource = noImageResource
+            }
+            onLoadComplete(0)
+        } else if (cache.containsKey(uri)) {
+            imageBitmap = cache[uri]!!
+            onLoadComplete(1)
+        } else {
+            val uriObj = Uri.parse(uri)
+            if (uriObj.scheme.contains("http")) {
+                loadingObs.value = (true)
+                requestBuilder.url(uri).lambdaBitmapExif(context, imageMaxWidth, imageMaxHeight).invokeAsync {
+                    loadingObs.value = (false)
+                    if (it.result == null) {
+                        //set to default image or broken image
+                        if (brokenImageResource != null) {
+                            imageResource = brokenImageResource
+                        }
+                        onLoadComplete(-1)
+                    } else {
+                        cache.put(uri, it.result!!)
                         imageBitmap = it.result
                         onLoadComplete(1)
                     }
