@@ -2,6 +2,7 @@ package com.lightningkite.kotlin.anko.full
 
 import android.graphics.Bitmap
 import android.net.Uri
+import android.util.Log
 import android.widget.ImageView
 import com.lightningkite.kotlin.anko.image.getBitmapFromUri
 import com.lightningkite.kotlin.anko.lifecycle
@@ -99,6 +100,7 @@ fun ImageView.bindUri(
                         if (brokenImageResource != null) {
                             imageResource = brokenImageResource
                         }
+                        Log.e("ImageView.ext", it.errorString)
                         onLoadComplete(-1)
                     } else {
                         imageBitmap = it.result
