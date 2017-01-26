@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
 import android.widget.ImageView
+import com.lightningkite.kotlin.anko.async.cancelling
 import com.lightningkite.kotlin.anko.image.getBitmapFromUri
 import com.lightningkite.kotlin.anko.lifecycle
 import com.lightningkite.kotlin.anko.networking.image.lambdaBitmapExif
@@ -40,7 +41,8 @@ fun ImageView.bindUri(
             val uriObj = Uri.parse(uri)
             if (uriObj.scheme.contains("http")) {
                 loadingObs.value = (true)
-                requestBuilder.url(uri).lambdaBitmapExif(context, imageMinBytes).invokeAsync {
+                requestBuilder.url(uri).lambdaBitmapExif(context, imageMinBytes).cancelling(this).invokeAsync {
+                    if (it == null) return@invokeAsync
                     loadingObs.value = (false)
                     if (it.result == null) {
                         //set to default image or broken image
@@ -93,7 +95,8 @@ fun ImageView.bindUri(
             val uriObj = Uri.parse(uri)
             if (uriObj.scheme.contains("http")) {
                 loadingObs.value = (true)
-                requestBuilder.url(uri).lambdaBitmapExif(context, imageMaxWidth, imageMaxHeight).invokeAsync {
+                requestBuilder.url(uri).lambdaBitmapExif(context, imageMaxWidth, imageMaxHeight).cancelling(this).invokeAsync {
+                    if (it == null) return@invokeAsync
                     loadingObs.value = (false)
                     if (it.result == null) {
                         //set to default image or broken image
@@ -150,7 +153,8 @@ fun ImageView.bindUri(
             val uriObj = Uri.parse(uri)
             if (uriObj.scheme.contains("http")) {
                 loadingObs.value = (true)
-                requestBuilder.url(uri).lambdaBitmapExif(context, imageMinBytes).invokeAsync {
+                requestBuilder.url(uri).lambdaBitmapExif(context, imageMinBytes).cancelling(this).invokeAsync {
+                    if (it == null) return@invokeAsync
                     loadingObs.value = (false)
                     if (it.result == null) {
                         //set to default image or broken image
@@ -208,7 +212,8 @@ fun ImageView.bindUri(
             val uriObj = Uri.parse(uri)
             if (uriObj.scheme.contains("http")) {
                 loadingObs.value = (true)
-                requestBuilder.url(uri).lambdaBitmapExif(context, imageMaxWidth, imageMaxHeight).invokeAsync {
+                requestBuilder.url(uri).lambdaBitmapExif(context, imageMaxWidth, imageMaxHeight).cancelling(this).invokeAsync {
+                    if (it == null) return@invokeAsync
                     loadingObs.value = (false)
                     if (it.result == null) {
                         //set to default image or broken image
