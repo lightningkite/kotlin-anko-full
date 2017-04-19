@@ -112,7 +112,7 @@ fun ImageView.bindUri(
                 }
             } else {
                 try {
-                    imageBitmap = context.getBitmapFromUri(Uri.parse(uri), 2048, 2048)!!
+                    imageBitmap = context.getBitmapFromUri(Uri.parse(uri), imageMaxWidth, imageMaxHeight)!!
                     onLoadComplete(1)
                 } catch(e: Exception) {
                     if (brokenImageResource != null) {
