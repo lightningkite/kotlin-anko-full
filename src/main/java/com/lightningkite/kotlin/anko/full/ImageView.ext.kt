@@ -49,6 +49,7 @@ fun ImageView.bindUri(
                         if (brokenImageResource != null) {
                             imageResource = brokenImageResource
                         }
+                        Log.e("ImageView.ext", "Error: " + it.errorString)
                         onLoadComplete(-1)
                     } else {
                         imageBitmap = it.result
@@ -63,6 +64,8 @@ fun ImageView.bindUri(
                     if (brokenImageResource != null) {
                         imageResource = brokenImageResource
                     }
+                    Log.e("ImageView.ext", "Error: " + e.message)
+                    e.printStackTrace()
                     onLoadComplete(-1)
                 }
             }
@@ -93,7 +96,7 @@ fun ImageView.bindUri(
             onLoadComplete(0)
         } else {
             val uriObj = Uri.parse(uri)
-            if (uriObj.scheme.contains("http")) {
+            if (uriObj.scheme?.contains("http") ?: false) {
                 loadingObs.value = (true)
                 requestBuilder.url(uri).lambdaBitmapExif(context, imageMaxWidth, imageMaxHeight).cancelling(this).invokeAsync {
                     if (it == null) return@invokeAsync
@@ -103,7 +106,7 @@ fun ImageView.bindUri(
                         if (brokenImageResource != null) {
                             imageResource = brokenImageResource
                         }
-                        Log.e("ImageView.ext", it.errorString)
+                        Log.e("ImageView.ext", "Error: " + it.errorString)
                         onLoadComplete(-1)
                     } else {
                         imageBitmap = it.result
@@ -118,6 +121,8 @@ fun ImageView.bindUri(
                     if (brokenImageResource != null) {
                         imageResource = brokenImageResource
                     }
+                    Log.e("ImageView.ext", "Error: " + e.message)
+                    e.printStackTrace()
                     onLoadComplete(-1)
                 }
             }
@@ -161,6 +166,7 @@ fun ImageView.bindUri(
                         if (brokenImageResource != null) {
                             imageResource = brokenImageResource
                         }
+                        Log.e("ImageView.ext", "Error: " + it.errorString)
                         onLoadComplete(-1)
                     } else {
                         cache.put(uri, it.result!!)
@@ -177,6 +183,8 @@ fun ImageView.bindUri(
                         imageResource = brokenImageResource
                     }
                     onLoadComplete(-1)
+                    Log.e("ImageView.ext", "Error: " + e.message)
+                    e.printStackTrace()
                 }
             }
         }
@@ -220,6 +228,7 @@ fun ImageView.bindUri(
                         if (brokenImageResource != null) {
                             imageResource = brokenImageResource
                         }
+                        Log.e("ImageView.ext", "Error: " + it.errorString)
                         onLoadComplete(-1)
                     } else {
                         cache.put(uri, it.result!!)
@@ -235,6 +244,7 @@ fun ImageView.bindUri(
                     if (brokenImageResource != null) {
                         imageResource = brokenImageResource
                     }
+                    Log.e("ImageView.ext", "Error: " + e.message)
                     onLoadComplete(-1)
                 }
             }
