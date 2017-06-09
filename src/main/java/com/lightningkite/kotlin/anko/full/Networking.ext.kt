@@ -1,13 +1,14 @@
 package com.lightningkite.kotlin.anko.full
 
+import android.app.Activity
 import android.view.View
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
+import com.lightningkite.kotlin.anko.getActivity
 import com.lightningkite.kotlin.anko.snackbar
 import com.lightningkite.kotlin.anko.viewcontrollers.dialogs.infoDialog
-import com.lightningkite.kotlin.anko.viewcontrollers.implementations.VCActivity
 import com.lightningkite.kotlin.async.doUiThread
 import com.lightningkite.kotlin.networking.MyGson
 import com.lightningkite.kotlin.networking.TypedResponse
@@ -54,14 +55,14 @@ fun <T> (() -> TypedResponse<T>).captureFailureInSnackbar(view: View, genericErr
 }
 
 fun <T> (() -> TypedResponse<T>).captureFailureInDialog(view: View, errorTextResource: Int, genericError: Int): () -> TypedResponse<T>
-        = captureFailureInDialog(view.context as VCActivity, errorTextResource, genericError)
+        = captureFailureInDialog(view.getActivity(), errorTextResource, genericError)
 
-fun <T> (() -> TypedResponse<T>).captureFailureInDialog(activity: VCActivity, errorTextResource: Int, genericError: Int): () -> TypedResponse<T> {
+fun <T> (() -> TypedResponse<T>).captureFailureInDialog(activity: Activity?, errorTextResource: Int, genericError: Int): () -> TypedResponse<T> {
     return {
         val response = this.invoke()
         if (!response.isSuccessful()) {
             doUiThread {
-                activity.infoDialog(
+                activity?.infoDialog(
                         activity.resources.getString(errorTextResource),
                         response.toHumanStringError(activity.resources.getString(genericError))
                 )
