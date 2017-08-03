@@ -7,6 +7,7 @@ import android.widget.ImageView
 import com.lightningkite.kotlin.anko.async.cancelling
 import com.lightningkite.kotlin.anko.image.getBitmapFromUri
 import com.lightningkite.kotlin.anko.lifecycle
+import com.lightningkite.kotlin.anko.networking.image.ImageLoader
 import com.lightningkite.kotlin.anko.networking.image.lambdaBitmapExif
 import com.lightningkite.kotlin.async.invokeAsync
 import com.lightningkite.kotlin.observable.property.MutableObservableProperty
@@ -232,6 +233,59 @@ fun ImageView.bindUri(
                         onLoadComplete(-1)
                     } else {
                         cache.put(uri, it.result!!)
+                        imageBitmap = it.result
+                        onLoadComplete(1)
+                    }
+                }
+            } else {
+                try {
+                    imageBitmap = context.getBitmapFromUri(Uri.parse(uri), 2048, 2048)!!
+                    onLoadComplete(1)
+                } catch(e: Exception) {
+                    if (brokenImageResource != null) {
+                        imageResource = brokenImageResource
+                    }
+                    Log.e("ImageView.ext", "Error: " + e.message)
+                    onLoadComplete(-1)
+                }
+            }
+        }
+    }
+}
+
+fun ImageView.bindUri(
+        uriObservable: ObservableProperty<String?>,
+        imageLoader: ImageLoader,
+        noImageResource: Int? = null,
+        brokenImageResource: Int? = null,
+        loadingObs: MutableObservableProperty<Boolean> = StandardObservableProperty(false),
+        onLoadComplete: (state: Int) -> Unit = {}
+) {
+    var lastUri: String? = "nomatch"
+    lifecycle.bind(uriObservable) { uri ->
+        if (lastUri == uri) return@bind
+        lastUri = uri
+
+        if (uri == null || uri.isEmpty()) {
+            //set to default image
+            if (noImageResource != null) {
+                imageResource = noImageResource
+            }
+            onLoadComplete(0)
+        } else {
+            val uriObj = Uri.parse(uri)
+            if (uriObj.scheme.contains("http")) {
+                loadingObs.value = (true)
+                imageLoader.getImage(context, uri) {
+                    loadingObs.value = (false)
+                    if (it.result == null) {
+                        //set to default image or broken image
+                        if (brokenImageResource != null) {
+                            imageResource = brokenImageResource
+                        }
+                        Log.e("ImageView.ext", "Error: " + it.errorString)
+                        onLoadComplete(-1)
+                    } else {
                         imageBitmap = it.result
                         onLoadComplete(1)
                     }
