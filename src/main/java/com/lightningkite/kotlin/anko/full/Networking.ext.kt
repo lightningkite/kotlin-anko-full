@@ -1,6 +1,7 @@
 package com.lightningkite.kotlin.anko.full
 
 import android.app.Activity
+import android.content.Context
 import android.view.View
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
@@ -9,7 +10,9 @@ import com.google.gson.JsonPrimitive
 import com.lightningkite.kotlin.anko.getActivity
 import com.lightningkite.kotlin.anko.snackbar
 import com.lightningkite.kotlin.anko.viewcontrollers.dialogs.infoDialog
+import com.lightningkite.kotlin.anko.viewcontrollers.dialogs.progressDialog
 import com.lightningkite.kotlin.async.doUiThread
+import com.lightningkite.kotlin.invokeAll
 import com.lightningkite.kotlin.networking.MyGson
 import com.lightningkite.kotlin.networking.TypedResponse
 import com.lightningkite.kotlin.observable.property.MutableObservableProperty
@@ -38,6 +41,23 @@ fun <T> (() -> T).captureProgress(observable: MutableObservableProperty<Int>): (
             observable.value--
         }
         result
+    }
+}
+
+fun <T> (() -> T).captureProgressInDialog(view: View, title: Int? = null, message: Int): (() -> T)
+        = captureProgressInDialog(view.context, title, message)
+
+fun <T> (() -> T).captureProgressInDialog(context: Context, title: Int? = null, message: Int): (() -> T) {
+    return {
+        val dialogEndEvent = ArrayList<() -> Unit>()
+        context.progressDialog(
+                title = title,
+                message = message,
+                completeSignal = dialogEndEvent
+        )
+        val response = this.invoke()
+        dialogEndEvent.invokeAll()
+        response
     }
 }
 
