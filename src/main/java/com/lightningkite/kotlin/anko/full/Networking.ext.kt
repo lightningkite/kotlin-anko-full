@@ -8,14 +8,18 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import com.lightningkite.kotlin.anko.getActivity
+import com.lightningkite.kotlin.anko.lifecycle
 import com.lightningkite.kotlin.anko.snackbar
 import com.lightningkite.kotlin.anko.viewcontrollers.dialogs.infoDialog
-import com.lightningkite.kotlin.anko.viewcontrollers.dialogs.progressDialog
+import com.lightningkite.kotlin.anko.viewcontrollers.dialogs.standardDialog
 import com.lightningkite.kotlin.async.doUiThread
-import com.lightningkite.kotlin.invokeAll
 import com.lightningkite.kotlin.networking.MyGson
 import com.lightningkite.kotlin.networking.TypedResponse
 import com.lightningkite.kotlin.observable.property.MutableObservableProperty
+import com.lightningkite.kotlin.observable.property.ObservableProperty
+import com.lightningkite.kotlin.observable.property.StandardObservableProperty
+import com.lightningkite.kotlin.observable.property.bind
+import org.jetbrains.anko.progressBar
 
 fun <T> (() -> T).captureProgress(observable: MutableObservableProperty<Boolean>): (() -> T) {
     return {
@@ -44,19 +48,39 @@ fun <T> (() -> T).captureProgress(observable: MutableObservableProperty<Int>): (
     }
 }
 
+fun Context.progressDialog(title: Int? = null, message: Int, runningObs: ObservableProperty<Boolean>) {
+    return standardDialog(title, message, listOf(), content = { stack ->
+        lifecycle.bind(runningObs) {
+            if (!it) stack.pop()
+        }
+        progressBar()
+    }, dismissOnClickOutside = false)
+}
+
+fun Context.progressDialog(title: String? = null, message: String, runningObs: ObservableProperty<Boolean>) {
+    return standardDialog(title, message, listOf(), content = { stack ->
+        lifecycle.bind(runningObs) {
+            if (!it) stack.pop()
+        }
+        progressBar()
+    }, dismissOnClickOutside = false)
+}
+
 fun <T> (() -> T).captureProgressInDialog(view: View, title: Int? = null, message: Int): (() -> T)
         = captureProgressInDialog(view.context, title, message)
 
 fun <T> (() -> T).captureProgressInDialog(context: Context, title: Int? = null, message: Int): (() -> T) {
     return {
-        val dialogEndEvent = ArrayList<() -> Unit>()
+        val runningObs = StandardObservableProperty(true)
         context.progressDialog(
                 title = title,
                 message = message,
-                completeSignal = dialogEndEvent
+                runningObs = runningObs
         )
         val response = this.invoke()
-        dialogEndEvent.invokeAll()
+        doUiThread {
+            runningObs.value = false
+        }
         response
     }
 }
