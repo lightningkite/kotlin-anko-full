@@ -42,26 +42,28 @@ fun ImageView.bindUri(
             val uriObj = Uri.parse(uri)
             if (uriObj.scheme.contains("http")) {
                 loadingObs.value = (true)
-                requestBuilder.url(uri).lambdaBitmapExif(context, imageMinBytes).cancelling(this).invokeAsync {
-                    if (it == null) return@invokeAsync
-                    loadingObs.value = (false)
-                    if (it.result == null) {
-                        //set to default image or broken image
-                        if (brokenImageResource != null) {
-                            imageResource = brokenImageResource
+                post {
+                    requestBuilder.url(uri).lambdaBitmapExif(context, imageMinBytes).cancelling(this).invokeAsync {
+                        if (it == null) return@invokeAsync
+                        loadingObs.value = (false)
+                        if (it.result == null) {
+                            //set to default image or broken image
+                            if (brokenImageResource != null) {
+                                imageResource = brokenImageResource
+                            }
+                            Log.e("ImageView.ext", "Error: " + it.errorString)
+                            onLoadComplete(-1)
+                        } else {
+                            imageBitmap = it.result
+                            onLoadComplete(1)
                         }
-                        Log.e("ImageView.ext", "Error: " + it.errorString)
-                        onLoadComplete(-1)
-                    } else {
-                        imageBitmap = it.result
-                        onLoadComplete(1)
                     }
                 }
             } else {
                 try {
                     imageBitmap = context.getBitmapFromUri(Uri.parse(uri), 2048, 2048)!!
                     onLoadComplete(1)
-                } catch(e: Exception) {
+                } catch (e: Exception) {
                     if (brokenImageResource != null) {
                         imageResource = brokenImageResource
                     }
@@ -97,28 +99,32 @@ fun ImageView.bindUri(
             onLoadComplete(0)
         } else {
             val uriObj = Uri.parse(uri)
-            if (uriObj.scheme?.contains("http") ?: false) {
+            if (uriObj.scheme?.contains("http") == true) {
                 loadingObs.value = (true)
-                requestBuilder.url(uri).lambdaBitmapExif(context, imageMaxWidth, imageMaxHeight).cancelling(this).invokeAsync {
-                    if (it == null) return@invokeAsync
-                    loadingObs.value = (false)
-                    if (it.result == null) {
-                        //set to default image or broken image
-                        if (brokenImageResource != null) {
-                            imageResource = brokenImageResource
+                post {
+                    requestBuilder.url(uri).lambdaBitmapExif(context, imageMaxWidth, imageMaxHeight).cancelling(this).invokeAsync {
+                        if (it == null) {
+                            return@invokeAsync
                         }
-                        Log.e("ImageView.ext", "Error: " + it.errorString)
-                        onLoadComplete(-1)
-                    } else {
-                        imageBitmap = it.result
-                        onLoadComplete(1)
+                        loadingObs.value = (false)
+                        if (it.result == null) {
+                            //set to default image or broken image
+                            if (brokenImageResource != null) {
+                                imageResource = brokenImageResource
+                            }
+                            Log.e("ImageView.ext", "Error: " + it.errorString)
+                            onLoadComplete(-1)
+                        } else {
+                            imageBitmap = it.result
+                            onLoadComplete(1)
+                        }
                     }
                 }
             } else {
                 try {
                     imageBitmap = context.getBitmapFromUri(Uri.parse(uri), imageMaxWidth, imageMaxHeight)!!
                     onLoadComplete(1)
-                } catch(e: Exception) {
+                } catch (e: Exception) {
                     if (brokenImageResource != null) {
                         imageResource = brokenImageResource
                     }
@@ -159,27 +165,29 @@ fun ImageView.bindUri(
             val uriObj = Uri.parse(uri)
             if (uriObj.scheme.contains("http")) {
                 loadingObs.value = (true)
-                requestBuilder.url(uri).lambdaBitmapExif(context, imageMinBytes).cancelling(this).invokeAsync {
-                    if (it == null) return@invokeAsync
-                    loadingObs.value = (false)
-                    if (it.result == null) {
-                        //set to default image or broken image
-                        if (brokenImageResource != null) {
-                            imageResource = brokenImageResource
+                post {
+                    requestBuilder.url(uri).lambdaBitmapExif(context, imageMinBytes).cancelling(this).invokeAsync {
+                        if (it == null) return@invokeAsync
+                        loadingObs.value = (false)
+                        if (it.result == null) {
+                            //set to default image or broken image
+                            if (brokenImageResource != null) {
+                                imageResource = brokenImageResource
+                            }
+                            Log.e("ImageView.ext", "Error: " + it.errorString)
+                            onLoadComplete(-1)
+                        } else {
+                            cache.put(uri, it.result!!)
+                            imageBitmap = it.result
+                            onLoadComplete(1)
                         }
-                        Log.e("ImageView.ext", "Error: " + it.errorString)
-                        onLoadComplete(-1)
-                    } else {
-                        cache.put(uri, it.result!!)
-                        imageBitmap = it.result
-                        onLoadComplete(1)
                     }
                 }
             } else {
                 try {
                     imageBitmap = context.getBitmapFromUri(Uri.parse(uri), 2048, 2048)!!
                     onLoadComplete(1)
-                } catch(e: Exception) {
+                } catch (e: Exception) {
                     if (brokenImageResource != null) {
                         imageResource = brokenImageResource
                     }
@@ -221,27 +229,29 @@ fun ImageView.bindUri(
             val uriObj = Uri.parse(uri)
             if (uriObj.scheme.contains("http")) {
                 loadingObs.value = (true)
-                requestBuilder.url(uri).lambdaBitmapExif(context, imageMaxWidth, imageMaxHeight).cancelling(this).invokeAsync {
-                    if (it == null) return@invokeAsync
-                    loadingObs.value = (false)
-                    if (it.result == null) {
-                        //set to default image or broken image
-                        if (brokenImageResource != null) {
-                            imageResource = brokenImageResource
+                post {
+                    requestBuilder.url(uri).lambdaBitmapExif(context, imageMaxWidth, imageMaxHeight).cancelling(this).invokeAsync {
+                        if (it == null) return@invokeAsync
+                        loadingObs.value = (false)
+                        if (it.result == null) {
+                            //set to default image or broken image
+                            if (brokenImageResource != null) {
+                                imageResource = brokenImageResource
+                            }
+                            Log.e("ImageView.ext", "Error: " + it.errorString)
+                            onLoadComplete(-1)
+                        } else {
+                            cache.put(uri, it.result!!)
+                            imageBitmap = it.result
+                            onLoadComplete(1)
                         }
-                        Log.e("ImageView.ext", "Error: " + it.errorString)
-                        onLoadComplete(-1)
-                    } else {
-                        cache.put(uri, it.result!!)
-                        imageBitmap = it.result
-                        onLoadComplete(1)
                     }
                 }
             } else {
                 try {
                     imageBitmap = context.getBitmapFromUri(Uri.parse(uri), 2048, 2048)!!
                     onLoadComplete(1)
-                } catch(e: Exception) {
+                } catch (e: Exception) {
                     if (brokenImageResource != null) {
                         imageResource = brokenImageResource
                     }
@@ -294,7 +304,7 @@ fun ImageView.bindUri(
                 try {
                     imageBitmap = context.getBitmapFromUri(Uri.parse(uri), 2048, 2048)!!
                     onLoadComplete(1)
-                } catch(e: Exception) {
+                } catch (e: Exception) {
                     if (brokenImageResource != null) {
                         imageResource = brokenImageResource
                     }
