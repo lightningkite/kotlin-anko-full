@@ -21,6 +21,7 @@ import com.lightningkite.kotlin.observable.property.StandardObservableProperty
 import com.lightningkite.kotlin.observable.property.bind
 import org.jetbrains.anko.progressBar
 
+@Deprecated("Use the version in kotlin-observable instead.", replaceWith = ReplaceWith("captureProgress(observable)", "com.lightningkite.kotlin.observable"))
 fun <T> (() -> T).captureProgress(observable: MutableObservableProperty<Boolean>): (() -> T) {
     return {
         doUiThread {
@@ -34,6 +35,7 @@ fun <T> (() -> T).captureProgress(observable: MutableObservableProperty<Boolean>
     }
 }
 
+@Deprecated("Use the version in kotlin-observable instead.", replaceWith = ReplaceWith("captureProgress(observable)", "com.lightningkite.kotlin.observable"))
 @JvmName("attachLoadingObservableInt")
 fun <T> (() -> T).captureProgress(observable: MutableObservableProperty<Int>): (() -> T) {
     return {
