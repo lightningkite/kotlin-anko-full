@@ -18,6 +18,12 @@ import okhttp3.Request
 import org.jetbrains.anko.imageBitmap
 import org.jetbrains.anko.imageResource
 
+object ImageViewBindUriConstants {
+    const val STATE_NO_IMAGE = 0
+    const val STATE_BROKEN_IMAGE = -1
+    const val STATE_IMAGE = 1
+}
+
 fun ImageView.bindUri(
         uriObservable: ObservableProperty<String?>,
         noImageResource: Int? = null,
@@ -37,7 +43,7 @@ fun ImageView.bindUri(
             if (noImageResource != null) {
                 imageResource = noImageResource
             }
-            onLoadComplete(0)
+            onLoadComplete(ImageViewBindUriConstants.STATE_NO_IMAGE)
         } else {
             val uriObj = Uri.parse(uri)
             if (uriObj.scheme.contains("http")) {
@@ -52,24 +58,24 @@ fun ImageView.bindUri(
                                 imageResource = brokenImageResource
                             }
                             Log.e("ImageView.ext", "Error: " + it.errorString)
-                            onLoadComplete(-1)
+                            onLoadComplete(ImageViewBindUriConstants.STATE_BROKEN_IMAGE)
                         } else {
                             imageBitmap = it.result
-                            onLoadComplete(1)
+                            onLoadComplete(ImageViewBindUriConstants.STATE_IMAGE)
                         }
                     }
                 }
             } else {
                 try {
                     imageBitmap = context.getBitmapFromUri(Uri.parse(uri), 2048, 2048)!!
-                    onLoadComplete(1)
+                    onLoadComplete(ImageViewBindUriConstants.STATE_IMAGE)
                 } catch (e: Exception) {
                     if (brokenImageResource != null) {
                         imageResource = brokenImageResource
                     }
                     Log.e("ImageView.ext", "Error: " + e.message)
                     e.printStackTrace()
-                    onLoadComplete(-1)
+                    onLoadComplete(ImageViewBindUriConstants.STATE_BROKEN_IMAGE)
                 }
             }
         }
@@ -96,7 +102,7 @@ fun ImageView.bindUri(
             if (noImageResource != null) {
                 imageResource = noImageResource
             }
-            onLoadComplete(0)
+            onLoadComplete(ImageViewBindUriConstants.STATE_NO_IMAGE)
         } else {
             val uriObj = Uri.parse(uri)
             if (uriObj.scheme?.contains("http") == true) {
@@ -113,24 +119,24 @@ fun ImageView.bindUri(
                                 imageResource = brokenImageResource
                             }
                             Log.e("ImageView.ext", "Error: " + it.errorString)
-                            onLoadComplete(-1)
+                            onLoadComplete(ImageViewBindUriConstants.STATE_BROKEN_IMAGE)
                         } else {
                             imageBitmap = it.result
-                            onLoadComplete(1)
+                            onLoadComplete(ImageViewBindUriConstants.STATE_IMAGE)
                         }
                     }
                 }
             } else {
                 try {
                     imageBitmap = context.getBitmapFromUri(Uri.parse(uri), imageMaxWidth, imageMaxHeight)!!
-                    onLoadComplete(1)
+                    onLoadComplete(ImageViewBindUriConstants.STATE_IMAGE)
                 } catch (e: Exception) {
                     if (brokenImageResource != null) {
                         imageResource = brokenImageResource
                     }
                     Log.e("ImageView.ext", "Error: " + e.message)
                     e.printStackTrace()
-                    onLoadComplete(-1)
+                    onLoadComplete(ImageViewBindUriConstants.STATE_BROKEN_IMAGE)
                 }
             }
         }
@@ -157,10 +163,10 @@ fun ImageView.bindUri(
             if (noImageResource != null) {
                 imageResource = noImageResource
             }
-            onLoadComplete(0)
+            onLoadComplete(ImageViewBindUriConstants.STATE_NO_IMAGE)
         } else if (cache.containsKey(uri)) {
             imageBitmap = cache[uri]!!
-            onLoadComplete(1)
+            onLoadComplete(ImageViewBindUriConstants.STATE_IMAGE)
         } else {
             val uriObj = Uri.parse(uri)
             if (uriObj.scheme.contains("http")) {
@@ -175,23 +181,23 @@ fun ImageView.bindUri(
                                 imageResource = brokenImageResource
                             }
                             Log.e("ImageView.ext", "Error: " + it.errorString)
-                            onLoadComplete(-1)
+                            onLoadComplete(ImageViewBindUriConstants.STATE_BROKEN_IMAGE)
                         } else {
                             cache.put(uri, it.result!!)
                             imageBitmap = it.result
-                            onLoadComplete(1)
+                            onLoadComplete(ImageViewBindUriConstants.STATE_IMAGE)
                         }
                     }
                 }
             } else {
                 try {
                     imageBitmap = context.getBitmapFromUri(Uri.parse(uri), 2048, 2048)!!
-                    onLoadComplete(1)
+                    onLoadComplete(ImageViewBindUriConstants.STATE_IMAGE)
                 } catch (e: Exception) {
                     if (brokenImageResource != null) {
                         imageResource = brokenImageResource
                     }
-                    onLoadComplete(-1)
+                    onLoadComplete(ImageViewBindUriConstants.STATE_BROKEN_IMAGE)
                     Log.e("ImageView.ext", "Error: " + e.message)
                     e.printStackTrace()
                 }
@@ -221,10 +227,10 @@ fun ImageView.bindUri(
             if (noImageResource != null) {
                 imageResource = noImageResource
             }
-            onLoadComplete(0)
+            onLoadComplete(ImageViewBindUriConstants.STATE_NO_IMAGE)
         } else if (cache.containsKey(uri)) {
             imageBitmap = cache[uri]!!
-            onLoadComplete(1)
+            onLoadComplete(ImageViewBindUriConstants.STATE_IMAGE)
         } else {
             val uriObj = Uri.parse(uri)
             if (uriObj.scheme.contains("http")) {
@@ -239,24 +245,24 @@ fun ImageView.bindUri(
                                 imageResource = brokenImageResource
                             }
                             Log.e("ImageView.ext", "Error: " + it.errorString)
-                            onLoadComplete(-1)
+                            onLoadComplete(ImageViewBindUriConstants.STATE_BROKEN_IMAGE)
                         } else {
                             cache.put(uri, it.result!!)
                             imageBitmap = it.result
-                            onLoadComplete(1)
+                            onLoadComplete(ImageViewBindUriConstants.STATE_IMAGE)
                         }
                     }
                 }
             } else {
                 try {
                     imageBitmap = context.getBitmapFromUri(Uri.parse(uri), 2048, 2048)!!
-                    onLoadComplete(1)
+                    onLoadComplete(ImageViewBindUriConstants.STATE_IMAGE)
                 } catch (e: Exception) {
                     if (brokenImageResource != null) {
                         imageResource = brokenImageResource
                     }
                     Log.e("ImageView.ext", "Error: " + e.message)
-                    onLoadComplete(-1)
+                    onLoadComplete(ImageViewBindUriConstants.STATE_BROKEN_IMAGE)
                 }
             }
         }
@@ -281,7 +287,7 @@ fun ImageView.bindUri(
             if (noImageResource != null) {
                 imageResource = noImageResource
             }
-            onLoadComplete(0)
+            onLoadComplete(ImageViewBindUriConstants.STATE_NO_IMAGE)
         } else {
             val uriObj = Uri.parse(uri)
             if (uriObj.scheme.contains("http")) {
@@ -294,22 +300,22 @@ fun ImageView.bindUri(
                             imageResource = brokenImageResource
                         }
                         Log.e("ImageView.ext", "Error: " + it.errorString)
-                        onLoadComplete(-1)
+                        onLoadComplete(ImageViewBindUriConstants.STATE_BROKEN_IMAGE)
                     } else {
                         imageBitmap = it.result
-                        onLoadComplete(1)
+                        onLoadComplete(ImageViewBindUriConstants.STATE_IMAGE)
                     }
                 }
             } else {
                 try {
                     imageBitmap = context.getBitmapFromUri(Uri.parse(uri), 2048, 2048)!!
-                    onLoadComplete(1)
+                    onLoadComplete(ImageViewBindUriConstants.STATE_IMAGE)
                 } catch (e: Exception) {
                     if (brokenImageResource != null) {
                         imageResource = brokenImageResource
                     }
                     Log.e("ImageView.ext", "Error: " + e.message)
-                    onLoadComplete(-1)
+                    onLoadComplete(ImageViewBindUriConstants.STATE_BROKEN_IMAGE)
                 }
             }
         }
