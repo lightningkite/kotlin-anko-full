@@ -3,31 +3,31 @@ package com.lightningkite.kotlin.anko.full
 import android.app.Activity
 import android.content.Context
 import android.view.View
-import com.google.gson.JsonArray
-import com.google.gson.JsonElement
-import com.google.gson.JsonObject
-import com.google.gson.JsonPrimitive
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.ArrayNode
+import com.fasterxml.jackson.databind.node.ObjectNode
+import com.lightningkite.kotlin.anko.async.UIThread
 import com.lightningkite.kotlin.anko.getActivity
 import com.lightningkite.kotlin.anko.lifecycle
 import com.lightningkite.kotlin.anko.snackbar
 import com.lightningkite.kotlin.anko.viewcontrollers.dialogs.infoDialog
 import com.lightningkite.kotlin.anko.viewcontrollers.dialogs.standardDialog
-import com.lightningkite.kotlin.async.doUiThread
-import com.lightningkite.kotlin.networking.MyGson
 import com.lightningkite.kotlin.networking.TypedResponse
+import com.lightningkite.kotlin.networking.jackson.MyJackson
 import com.lightningkite.kotlin.observable.property.MutableObservableProperty
 import com.lightningkite.kotlin.observable.property.ObservableProperty
 import com.lightningkite.kotlin.observable.property.StandardObservableProperty
 import com.lightningkite.kotlin.observable.property.bind
 import org.jetbrains.anko.progressBar
+import java.util.concurrent.Executor
 
-fun <T> (() -> T).captureProgress(observable: MutableObservableProperty<Boolean>): (() -> T) {
+fun <T> (() -> T).captureProgress(observable: MutableObservableProperty<Boolean>, executor: Executor = UIThread): (() -> T) {
     return {
-        doUiThread {
+        executor.execute {
             observable.value = true
         }
         val result = this()
-        doUiThread {
+        executor.execute {
             observable.value = false
         }
         result
@@ -35,13 +35,13 @@ fun <T> (() -> T).captureProgress(observable: MutableObservableProperty<Boolean>
 }
 
 @JvmName("attachLoadingObservableInt")
-fun <T> (() -> T).captureProgress(observable: MutableObservableProperty<Int>): (() -> T) {
+fun <T> (() -> T).captureProgress(observable: MutableObservableProperty<Int>, executor: Executor = UIThread): (() -> T) {
     return {
-        doUiThread {
+        executor.execute {
             observable.value++
         }
         val result = this()
-        doUiThread {
+        executor.execute {
             observable.value--
         }
         result
@@ -78,7 +78,7 @@ fun <T> (() -> T).captureProgressInDialog(context: Context, title: Int? = null, 
                 runningObs = runningObs
         )
         val response = this.invoke()
-        doUiThread {
+        UIThread.execute {
             runningObs.value = false
         }
         response
@@ -89,7 +89,7 @@ fun <T> (() -> TypedResponse<T>).captureFailureInSnackbar(view: View, genericErr
     return {
         val response = this.invoke()
         if (!response.isSuccessful()) {
-            doUiThread {
+            UIThread.execute {
                 view.snackbar(response.toHumanStringError(view.resources.getString(genericError)))
             }
         }
@@ -105,7 +105,7 @@ fun <T> (() -> TypedResponse<T>).captureFailureInDialog(activity: Activity?, err
     return {
         val response = this.invoke()
         if (!response.isSuccessful()) {
-            doUiThread {
+            UIThread.execute {
                 activity?.infoDialog(
                         activity.resources.getString(errorTextResource),
                         response.toHumanStringError(activity.resources.getString(genericError))
@@ -117,18 +117,11 @@ fun <T> (() -> TypedResponse<T>).captureFailureInDialog(activity: Activity?, err
     }
 }
 
-fun JsonElement.toHumanString(modifier: (String) -> String? = { it }, combiningString: String = "\n"): String {
+fun JsonNode.toHumanString(modifier: (String) -> String? = { it }, combiningString: String = "\n"): String {
     var error: String = ""
     when (this) {
-        is JsonPrimitive -> {
-            error = if (this.isString)
-                this.asString
-            else
-                this.toString()
-
-        }
-        is JsonObject -> {
-            error = this.entrySet().map {
+        is ObjectNode -> {
+            error = this.fields().asSequence().map {
                 val key = modifier(it.key)
                 val value = modifier(it.value.toHumanString(modifier, combiningString))
                 if (key == null) value
@@ -136,14 +129,15 @@ fun JsonElement.toHumanString(modifier: (String) -> String? = { it }, combiningS
                 else "$key: $value"
             }.joinToString(combiningString)
         }
-        is JsonArray -> {
+        is ArrayNode -> {
             error = this.map { it.toHumanString(modifier, combiningString) }.mapNotNull(modifier).joinToString(combiningString)
         }
+        else -> this.asText()
     }
     return error
 }
 
-fun JsonElement.toHumanStringError() = toHumanString(modifier = { if (it.firstOrNull()?.isUpperCase() ?: false) it else null })
+fun JsonNode.toHumanStringError() = toHumanString(modifier = { if (it.firstOrNull()?.isUpperCase() ?: false) it else null })
 
 fun TypedResponse<*>.toHumanStringError(fallback: String): String {
     if (errorBytes == null) return fallback
@@ -156,7 +150,7 @@ fun TypedResponse<*>.toHumanStringError(fallback: String): String {
 
 fun String.toHumanStringError(fallback: String): String {
     return try {
-        MyGson.json.parse(this).toHumanStringError()
+        MyJackson.mapper.valueToTree<JsonNode>(this).toHumanStringError()
     } catch(e: Exception) {
         fallback
     }
