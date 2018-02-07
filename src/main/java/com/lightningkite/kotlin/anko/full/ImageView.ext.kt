@@ -94,7 +94,6 @@ fun ImageView.bindUri(
 ) {
     var lastUri: String? = "nomatch"
     lifecycle.bind(uriObservable) { uri ->
-        println("URI: $lastUri -> $uri")
         if (lastUri == uri) return@bind
         lastUri = uri
 
