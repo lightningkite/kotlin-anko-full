@@ -9,7 +9,6 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import com.lightningkite.kotlin.anko.getActivity
 import com.lightningkite.kotlin.anko.lifecycle
-import com.lightningkite.kotlin.anko.snackbar
 import com.lightningkite.kotlin.anko.viewcontrollers.dialogs.infoDialog
 import com.lightningkite.kotlin.anko.viewcontrollers.dialogs.standardDialog
 import com.lightningkite.kotlin.async.doUiThread
@@ -83,19 +82,6 @@ fun <T> (() -> T).captureProgressInDialog(context: Context, title: Int? = null, 
         doUiThread {
             runningObs.value = false
         }
-        response
-    }
-}
-
-fun <T> (() -> TypedResponse<T>).captureFailureInSnackbar(view: View, genericError: Int): () -> TypedResponse<T> {
-    return {
-        val response = this.invoke()
-        if (!response.isSuccessful()) {
-            doUiThread {
-                view.snackbar(response.toHumanStringError(view.resources.getString(genericError)))
-            }
-        }
-
         response
     }
 }
